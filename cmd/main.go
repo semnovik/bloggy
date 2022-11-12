@@ -5,20 +5,25 @@ import (
 	"bloggy/package/handler"
 	"bloggy/package/repository"
 	"bloggy/package/service"
+	"context"
+	"github.com/demimurg/twitter/pkg/log"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 )
 
 func main() {
+	log.SetLevel("DEBUG")
+
+	ctx := context.Background()
+
 	if err := InitConfig(); err != nil {
-		log.Fatalf("error occured while reading the config: %s", err.Error())
+		log.Fatal(ctx, "error with reading config", "error", err)
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error occured while reading the env-virables: %s", err.Error())
+		log.Fatal(ctx, "error with reading env-variables", "error", err)
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -30,7 +35,7 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
-		log.Fatalf("error occured while inicialize db: %s", err.Error())
+		log.Fatal(ctx, "error while initialize db", "error", err)
 	}
 
 	repos := repository.NewRepository(db)
@@ -39,7 +44,7 @@ func main() {
 
 	srv := new(bloggy.Server)
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error occured while running http server: %s", err.Error())
+		log.Fatal(ctx, "error occurred while running http server", "error", err)
 	}
 }
 
