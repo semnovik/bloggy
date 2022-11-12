@@ -14,3 +14,6 @@ migration-down:
 
 db-down:
 	- docker-compose -f docker-compose.yaml down
+
+inside-db:
+	- docker exec -it bloggy-db /bin/bash
