@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bloggy"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,13 +15,14 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	id, err := h.services.CreateUser(input)
+	id, name, err := h.services.CreateUser(input)
 	if err != nil {
 		newRequestError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 	ctx.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"id":      id,
+		"message": fmt.Sprintf("User %v was successfully created!", name),
 	})
 }
 
